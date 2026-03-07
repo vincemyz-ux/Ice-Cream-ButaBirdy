@@ -160,6 +160,7 @@
     const sensSlider = document.getElementById('sensitivity');
     const sensValue  = document.getElementById('sensValue');
     let sensitivity = 0.75;
+    let spd = 3.3;  // default BASE_SPEED
 
     sensSlider.addEventListener('input', (e) => {
         sensitivity = e.target.value / 100;
@@ -833,13 +834,13 @@
 
         if (bird.y + bird.radius > canvas.height || bird.y - bird.radius < 0) return endGame();
 
+        const spd = getSpeed();
+
         const baseSpawnInterval = 140;
         const sensitivityFactor = 60;
         const spawnInterval = Math.round(baseSpawnInterval - (sensitivity * sensitivityFactor));
 
         if (frame % spawnInterval === 0) addObstacle();
-
-        const spd = getSpeed();
 
         obstacles.forEach((o, i) => {
             o.x -= spd;
