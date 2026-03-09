@@ -423,7 +423,8 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
             life: isButterfly ? 40 + Math.floor(Math.random() * 50) : 60 + Math.floor(Math.random() * 80),
             color: color,
             isSprinkle,
-            gravity: isButterfly ? 0.08 + Math.random() * 0.04 : 0.12 + Math.random() * 0.06
+            gravity: isButterfly ? 0.08 + Math.random() * 0.04 : 0.12 + Math.random() * 0.06,
+            isButterfly: isButterfly
         });
     }
 
@@ -449,7 +450,7 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
         particles.forEach(p => {
             p.x += p.vx;
             p.y += p.vy;
-            p.vy += 0.12;
+            p.vy += p.gravity;
             p.size *= 0.975;
         });
     }
