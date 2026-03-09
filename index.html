@@ -995,8 +995,8 @@ butterflies.forEach((b, i) => {
     const dy = bird.y - b.y;
     if (Math.hypot(dx, dy) < bird.radius + 6) {
         butterfliesEaten++;
-        createParticles(b.x, b.y, b.color, false, 3);  // ← color-matched tiny main particles
-        createParticles(b.x, b.y, b.color, true, 2);   // ← color-matched tiny sprinkles
+        createParticles(b.x, b.y, b.color, false, 3, true);  // ← color-matched tiny main particles
+        createParticles(b.x, b.y, b.color, true, 2, true);   // ← color-matched tiny sprinkles
         butterflies.splice(i, 1);
     }
 });
