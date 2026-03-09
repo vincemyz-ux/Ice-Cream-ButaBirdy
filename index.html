@@ -406,15 +406,14 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
     for (let i = 0; i < num; i++) {
         const speedMultiplier = 1 + (intensity - 1) * 0.8;
 
-        // Tiny sizes ONLY for butterfly explosions
+        // Tiny sizes ONLY for butterfly explosions 
         const particleSize = isButterfly 
             ? (isSprinkle 
-                ? 0.6 + Math.random() * 1.8   // tiny sprinkles butterflies
-                : 1.0 + Math.random() * 2.0)  // small to tiny main butterflies
+                ? 1.8 + Math.random() * 1.8   // 1.8–3.6 px – tiny lines for sprinkles
+                : 3.6 + Math.random() * 3.6)  // 3.6–7.2 px – small dots for main particles
             : (isSprinkle 
-                ? 3 + Math.random() * 6       // normal sprinkle size (unchanged)
-                : 6 + Math.random() * 12);    // normal big explosion size (unchanged)
-
+                ? 3 + Math.random() * 6 
+                : 6 + Math.random() * 18);    // keep original chunky sizes for ice cream
         particles.push({
             x, y,
             vx: (Math.random() - 0.5) * 10 * speedMultiplier,
