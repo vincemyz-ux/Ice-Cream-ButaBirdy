@@ -398,29 +398,42 @@
         }
         return sprinkles;
     }
-        // PARTICLES
-    function createParticles(x, y, color, isSprinkle = false, intensity = 1) {
+    // PARTICLES
+    function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButterfly = false) {
         const baseNum = isSprinkle ? 5 : 8;
         const num = (baseNum + Math.floor(Math.random() * 6)) * intensity;
 
         for (let i = 0; i < num; i++) {
             const speedMultiplier = 1 + (intensity - 1) * 0.8;
 
-            particles.push({
-                x, y,
-                vx: (Math.random() - 0.5) * 10 * speedMultiplier,
-                vy: (Math.random() - 0.5) * 8 * speedMultiplier - 4,
-                size: isSprinkle 
-                    ? 2 + Math.random() * 5
-                    : 5 + Math.random() * 12,
-                life: 60 + Math.floor(Math.random() * 80),
-                color: isSprinkle ? randomColor(sprinkleColors) : color,
-                isSprinkle,
-                gravity: 0.12 + Math.random() * 0.06
-            });
-        }
+            // Tiny sizes ONLY for butterfly explosions
+            const particleSize = isButterfly 
+                ? (isSprinkle 
+                    ? 1.8 + Math.random() * 1.8   
+                    // tiny sprinkles butterflies
+                    : 3.6 + Math.random() * 3.6)  
+                    // small to tiny main butterflies
+                : (isSprinkle 
+                    ? 3 + Math.random() * 6      
+                     // normal sprinkle size (unchanged)
+                    : 6 + Math.random() * 18);   
+                     // normal big explosions
+                
+particles.push({
+    x, y,
+    vx: (Math.random() - 0.5) * 10 * speedMultiplier,
+    vy: (Math.random() - 0.5) * 8 * speedMultiplier - (isButterfly ? 6 : 4),
+    size: particleSize,
+    life: isButterfly ? 140 + Math.floor(Math.random() * 120) : 60 + Math.floor(Math.random() * 80),
+    color: color,
+    isSprinkle,
+    gravity: isButterfly ? 0.018 + Math.random() * 0.028 : 0.12 + Math.random() * 0.06,
+    isButterfly: isButterfly,  
+    
+});
 
-        if (intensity >= 2) {
+        // No big chunks for butterflies
+        if (intensity >= 2 && !isButterfly) {
             for (let i = 0; i < 3 + Math.floor(Math.random() * 3); i++) {
                 particles.push({
                     x, y,
@@ -441,7 +454,7 @@
         particles.forEach(p => {
             p.x += p.vx;
             p.y += p.vy;
-            p.vy += 0.12;
+            p.vy += p.gravity;
             p.size *= 0.975;
         });
     }
@@ -486,29 +499,63 @@
             ctx.globalAlpha = b.life / 100;
             ctx.fillStyle = b.color;
 
-            // Flapping animation
-            const flap = Math.sin(frame * 0.1 + b.phase) * 0.2;
-            const wingScale = 1 + flap * 0.1;
-            const wingAngle = flap * 0.2;
+            // Harsh, snappy flap (cycle every 20 frames)
+            const cycle = (frame % 20);
+            let wingAngle = 0;
+            let wingScale = 1;
+
+            if (cycle < 5) {
+                wingAngle = 0.6;
+                wingScale = 1.15;
+            } else if (cycle < 10) {
+                wingAngle = 0.5;
+                wingScale = 1.1;
+            } else if (cycle < 15) {
+                wingAngle = -0.1;
+                wingScale = 0.95;
+            } else {
+                wingAngle = 0;
+                wingScale = 1;
+            }
 
             ctx.save();
             ctx.translate(b.x, b.y);
             ctx.scale(wingScale, wingScale);
 
-            // Wing 1 (ellipse at 45°)
+            // Wing 1 (upper-right at 45°)
             ctx.save();
             ctx.rotate(0.785 + wingAngle);
             ctx.beginPath();
-            ctx.ellipse(0, 0, 8, 4, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2);
             ctx.fill();
+
+            // Tiny sprinkles on Wing 1
+            ctx.strokeStyle = randomColor(sprinkleColors);
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(-8, -2); ctx.lineTo(-2, 2);
+            ctx.moveTo(4, -4); ctx.lineTo(8, 0);
+            ctx.moveTo(-2, 6); ctx.lineTo(2, 10);
+            ctx.stroke();
+
             ctx.restore();
 
-            // Wing 2 (ellipse at -45°)
+            // Wing 2 (lower-left at -45°)
             ctx.save();
             ctx.rotate(-0.785 - wingAngle);
             ctx.beginPath();
-            ctx.ellipse(0, 0, 8, 4, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2);
             ctx.fill();
+
+            // Tiny sprinkles on Wing 2
+            ctx.strokeStyle = randomColor(sprinkleColors);
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(8, -2); ctx.lineTo(2, 2);
+            ctx.moveTo(-4, -4); ctx.lineTo(-8, 0);
+            ctx.moveTo(2, 6); ctx.lineTo(-2, 10);
+            ctx.stroke();
+
             ctx.restore();
 
             ctx.restore();
@@ -780,14 +827,14 @@
             bites: []
         });
 
-        // Butterfly spawn (lightweight)
-        if (Math.random() < 0.05 && butterflies.length === 0) {
+        // Butterfly spawn (high rate)
+        if (Math.random() < 0.45 && butterflies.length < 3) {
             const gapY = topHeight + (gap / 2);
             const pattern = Math.floor(Math.random() * 3);
             let startY;
-            if (pattern === 0) startY = gapY + 80;  // bottom to middle
-            else if (pattern === 1) startY = gapY - 80;  // top to middle
-            else startY = gapY + (Math.random() - 0.5) * 120;  // middle wander
+            if (pattern === 0) startY = gapY + 80;
+            else if (pattern === 1) startY = gapY - 80;
+            else startY = gapY + (Math.random() - 0.5) * 120;
 
             butterflies.push({
                 x: canvas.width + 100,
@@ -834,7 +881,7 @@
 
         if (bird.y + bird.radius > canvas.height || bird.y - bird.radius < 0) return endGame();
 
-        const spd = getSpeed();
+        const spd = getSpeed();  // ← moved up here to be defined early
 
         const baseSpawnInterval = 140;
         const sensitivityFactor = 60;
@@ -946,17 +993,18 @@
                 cloud.y = layer.yBase + (Math.random() - 0.5) * 80;
             }
         });
-
-        // Butterfly collection
-        butterflies.forEach((b, i) => {
-            const dx = bird.x - b.x;
-            const dy = bird.y - b.y;
-            if (Math.hypot(dx, dy) < bird.radius + 6) {
-                butterfliesEaten++;
-                createParticles(b.x, b.y, '#FFFFFF', false, 2);  // light sparkle
-                butterflies.splice(i, 1);
-            }
-        });
+        
+// BUTTERFLY COLLECTION
+butterflies.forEach((b, i) => {
+    const dx = bird.x - b.x;
+    const dy = bird.y - b.y;
+    if (Math.hypot(dx, dy) < bird.radius + 6) {
+        butterfliesEaten++;
+        createParticles(b.x, b.y, b.color, false, 3, true);  // ← color-matched tiny main particles
+        createParticles(b.x, b.y, b.color, true, 2, true);   // ← color-matched tiny sprinkles
+        butterflies.splice(i, 1);
+    }
+});
 
         updateButterflies();
         updateParticles();
@@ -1021,7 +1069,7 @@
         restartButton.textContent = newHigh ? "Play Again? 🍦" : "Play Again? 🍨";
     }
 </script>
-         <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-         <script>eruda.init();</script>
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
 </body>
 </html>
