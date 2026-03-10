@@ -457,7 +457,7 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
     function drawParticles() {
         particles.forEach(p => {
             ctx.globalAlpha = p.isButterfly 
-                   ? Math.max(0, (p.life - 180) / 420)   // opaque 180 frames (~3s) fade next 420 frames
+    ? Math.max(0, p.life / 600)   // fade gradually from 1 to 0 over max ~600 frames ≈10seconds
                    : p.life / 100;
             if (p.isButterfly) {
     console.log("Butterfly particle life:", p.life, "alpha:", ctx.globalAlpha);
