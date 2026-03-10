@@ -416,13 +416,13 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
                 : 6 + Math.random() * 18);    // keep original chunky sizes for ice cream
         particles.push({
             x, y,
-            vx: (Math.random() - 0.5) * 10 * speedMultiplier,
-            vy: (Math.random() - 0.5) * 8 * speedMultiplier - 4,
+            vx: (Math.random() - 0.5) * (isButterfly ? 4 : 10) * speedMultiplier,     // .5 speed for butterflies
+            vy: (Math.random() - 0.5) * (isButterfly ? 3 : 8) * speedMultiplier - (isButterfly ? 6 : 4),  // slower vy spread + gentler upward bias
             size: particleSize,
-            life: isButterfly ? 40 + Math.floor(Math.random() * 50) : 60 + Math.floor(Math.random() * 80),
+            life: isButterfly ? 999 + Math.floor(Math.random() * 999) : 999 + Math.floor(Math.random() * 999),
             color: color,
             isSprinkle,
-            gravity: isButterfly ? 0.08 + Math.random() * 0.04 : 0.12 + Math.random() * 0.06,
+            gravity: isButterfly ? 0.08 + Math.random() * 0.08 : 0.12 + Math.random() * 0.06,
             isButterfly: isButterfly
         });
     }
@@ -823,7 +823,7 @@ function drawButterflies() {
         });
 
         // Butterfly spawn (lightweight)
-        if (Math.random() < 0.88 && butterflies.length === 0) {
+        if (Math.random() < 0.98 && butterflies.length === 0) {
             const gapY = topHeight + (gap / 2);
             const pattern = Math.floor(Math.random() * 3);
             let startY;
