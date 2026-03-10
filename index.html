@@ -419,7 +419,7 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
             vx: (Math.random() - 0.5) * (isButterfly ? 4 : 10) * speedMultiplier,     // .5 speed for butterflies
             vy: (Math.random() - 0.5) * (isButterfly ? 3 : 8) * speedMultiplier - (isButterfly ? 6 : 4),  // slower vy spread + gentler upward bias
             size: particleSize,
-            life: isButterfly ? 2999 + Math.floor(Math.random() * 999) : 999 + Math.floor(Math.random() * 999),
+            life: isButterfly ? 300 + Math.floor(Math.random() * 120) : 60 + Math.floor(Math.random() * 80),  //  frames ≈4–6s
             color: color,
             isSprinkle,
             gravity: isButterfly ? 0.08 + Math.random() * 0.08 : 0.12 + Math.random() * 0.06,
@@ -456,7 +456,9 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
 
     function drawParticles() {
         particles.forEach(p => {
-            ctx.globalAlpha = p.isButterfly ? Math.min(1, p.life / 999) : p.life / 100;  // fade frames
+            ctx.globalAlpha = p.isButterfly 
+    ? Math.max(0, (p.life - 100) / 240)   // life + fade
+                   : p.life / 100;
             ctx.fillStyle = p.color;
             if (p.isSprinkle) {
                 ctx.save();
@@ -823,7 +825,7 @@ function drawButterflies() {
         });
 
         // Butterfly spawn (lightweight)
-        if (Math.random() < 0.98 && butterflies.length === 0) {
+        if (Math.random() < 0.75 && butterflies.length < 2) {  // 60% chance, max 2 at a time
             const gapY = topHeight + (gap / 2);
             const pattern = Math.floor(Math.random() * 3);
             let startY;
