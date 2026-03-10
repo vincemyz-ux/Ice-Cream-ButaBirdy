@@ -182,7 +182,8 @@
     const maxEaten = 20;
     let butterfliesEaten = 0;
     let totalBites = 0;
-    let particles = [];
+    let iceCreamParticles = [];
+    let butterflyParticles = [];
     let butterflies = [];
 
     let obstacles = [];
@@ -416,13 +417,13 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
                 : 6 + Math.random() * 18);    // keep original chunky sizes for ice cream
         particles.push({
             x, y,
-            vx: (Math.random() - 0.5) * (isButterfly ? 4 : 10) * speedMultiplier,     // .5 speed for butterflies
-            vy: (Math.random() - 0.5) * (isButterfly ? 3 : 8) * speedMultiplier - (isButterfly ? 6 : 4),  // slower vy spread + gentler upward bias
+            vx: (Math.random() - 0.5) * (isButterfly ? 3 : 10) * speedMultiplier,     // .5 speed for butterflies
+            vy: (Math.random() - 0.5) * (isButterfly ? 1.5 : 8) * speedMultiplier - (isButterfly ? 6 : 4),  // slower vy spread + gentler upward bias
             size: particleSize,
             life: isButterfly ? 400 + Math.floor(Math.random() * 200) : 60 + Math.floor(Math.random() * 80),  //  frames ≈4–6s
             color: color,
             isSprinkle,
-            gravity: isButterfly ? 0.08 + Math.random() * 0.08 : 0.12 + Math.random() * 0.06,
+            gravity: isButterfly ? 0.012 + Math.random() * 0.018 : 0.12 + Math.random() * 0.06,
             isButterfly: isButterfly
         });
     }
@@ -456,31 +457,34 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
 
     function drawParticles() {
         particles.forEach(p => {
-            ctx.globalAlpha = p.isButterfly 
-    ? Math.max(0, p.life / 600)   // fade gradually from 1 to 0 over max ~600 frames ≈10seconds
-                   : p.life / 100;
-            if (p.isButterfly) {
-    console.log("Butterfly particle life:", p.life, "alpha:", ctx.globalAlpha);
-            }
-            ctx.fillStyle = p.color;
-            if (p.isSprinkle) {
-                ctx.save();
-                ctx.translate(p.x, p.y);
-                ctx.rotate(Math.atan2(p.vy, p.vx));
-                ctx.beginPath();
-                ctx.moveTo(-p.size/2, 0);
-                ctx.lineTo(p.size/2, 0);
-                ctx.lineWidth = p.size / 2.5;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = p.color;
-                ctx.stroke();
-                ctx.restore();
-            } else {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, Math.max(0.5, p.size), 0, Math.PI*2);
-                ctx.fill();
-            }
-            ctx.globalAlpha = 1;
+                ctx.save();  // ← save current state + alpha
+     // Set alpha ONLY for this particle
+                if (p.isButterfly) {
+                     ctx.globalAlpha = 1.0;  // no fade
+                } else {
+                     ctx.globalAlpha = p.life / 100;
+                }
+            
+                ctx.fillStyle = p.color;
+
+                if (p.isSprinkle) {
+                     ctx.translate(p.x, p.y);
+                     ctx.rotate(Math.atan2(p.vy, p.vx));
+                     ctx.beginPath();
+                     ctx.moveTo(-p.size/2, 0);
+                     ctx.lineTo(p.size/2, 0);
+                     ctx.lineWidth = p.size / 2.5;
+                     ctx.lineCap = 'round';
+                     ctx.strokeStyle = p.color;
+                     ctx.stroke();
+                     ctx.restore();  // restore after translate/rotate
+                } else {
+                     ctx.beginPath();
+                     ctx.arc(p.x, p.y, Math.max(0.5, p.size), 0, Math.PI*2);
+                     ctx.fill();
+                }
+
+                ctx.restore();  // ← restore original alpha + state for next particle
         });
     }
 
