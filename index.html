@@ -419,7 +419,7 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
             vx: (Math.random() - 0.5) * (isButterfly ? 4 : 10) * speedMultiplier,     // .5 speed for butterflies
             vy: (Math.random() - 0.5) * (isButterfly ? 3 : 8) * speedMultiplier - (isButterfly ? 6 : 4),  // slower vy spread + gentler upward bias
             size: particleSize,
-            life: isButterfly ? 999 + Math.floor(Math.random() * 999) : 999 + Math.floor(Math.random() * 999),
+            life: isButterfly ? 2999 + Math.floor(Math.random() * 999) : 999 + Math.floor(Math.random() * 999),
             color: color,
             isSprinkle,
             gravity: isButterfly ? 0.08 + Math.random() * 0.08 : 0.12 + Math.random() * 0.06,
@@ -456,7 +456,7 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
 
     function drawParticles() {
         particles.forEach(p => {
-            ctx.globalAlpha = p.life / 100;
+            ctx.globalAlpha = p.isButterfly ? Math.min(1, p.life / 999) : p.life / 100;  // fade frames
             ctx.fillStyle = p.color;
             if (p.isSprinkle) {
                 ctx.save();
