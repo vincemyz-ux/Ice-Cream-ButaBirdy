@@ -427,7 +427,7 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
         });
     }
 
-    // No big chunks for butterflies
+    // No big chunks for butterflies 
     if (intensity >= 2 && !isButterfly) {
         for (let i = 0; i < 3 + Math.floor(Math.random() * 3); i++) {
             particles.push({
@@ -457,7 +457,7 @@ function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButte
     function drawParticles() {
         particles.forEach(p => {
             ctx.globalAlpha = p.isButterfly 
-    ? Math.max(0, (p.life - 180) / 400)   // life + fade
+                   ? Math.max(0, (p.life - 180) / 420)   // opaque 180 frames (~3s) fade next 420 frames
                    : p.life / 100;
             if (p.isButterfly) {
     console.log("Butterfly particle life:", p.life, "alpha:", ctx.globalAlpha);
