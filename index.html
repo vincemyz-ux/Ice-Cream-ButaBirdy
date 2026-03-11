@@ -185,8 +185,9 @@
     let iceCreamParticles = [];
     let butterflyParticles = [];
     let butterflies = [];
-
+    let lastIceCreamEncounters = 0;
     let obstacles = [];
+    let iceCreamEncounters = 0;    // dodged + eaten
     let score = 0;
     let highScore = localStorage.getItem('giuliaIceCreamHigh') || 0;
     let gameRunning = false;
@@ -402,30 +403,34 @@
 
     // PARTICLES - split into iceCreamParticles and butterflyParticles
     function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButterfly = false) {
-        const baseNum = isSprinkle ? 5 : 8;
-        const num = (baseNum + Math.floor(Math.random() * 6)) * intensity;
+        const baseNum = isSprinkle ? 5 : 6;
+        const randomAdd = Math.floor(Math.random() * 9);
+        const baseCount = baseNum + randomAdd;
+        const num = isButterfly 
+                ? Math.floor(baseCount * intensity * 0.7) 
+                : baseCount * intensity;
 
         for (let i = 0; i < num; i++) {
             const speedMultiplier = 1 + (intensity - 1) * 0.8;
 
             const particleSize = isButterfly 
                 ? (isSprinkle 
-                    ? 1.8 + Math.random() * 1.8   // tiny sprinkles butterflies
-                    : 3.6 + Math.random() * 3.6)  // small to tiny main butterflies
+                    ? 1.8 + Math.random() * 2   // tiny sprinkles butterflies
+                    : 3 + Math.random() * 2)  // small to tiny main butterflies
                 : (isSprinkle 
                     ? 3 + Math.random() * 6       // normal sprinkle size
                     : 6 + Math.random() * 18);    // normal big explosion size
 
             const particle = {
                 x, y,
-                vx: (Math.random() - 0.5) * (isButterfly ? 4 : 10) * speedMultiplier,
-                vy: (Math.random() - 0.5) * (isButterfly ? 3 : 8) * speedMultiplier - (isButterfly ? 6 : 4),
+                vx: (Math.random() - 0.5) * (isButterfly ? 4 : 4) * speedMultiplier,
+                vy: (Math.random() - 0.5) * (isButterfly ? 2 : 8) * speedMultiplier - (isButterfly ? 3 : 4),
                 size: particleSize,
-                life: isButterfly ? 400 + Math.floor(Math.random() * 200) : 60 + Math.floor(Math.random() * 80),
+                life: isButterfly ? 2 + Math.floor(Math.random() * 1.5) : 440,
                 color: color,
                 isSprinkle,
-                gravity: isButterfly ? 0.018 + Math.random() * 0.028 : 0.12 + Math.random() * 0.06,
-                isButterfly
+                gravity: isButterfly ? 0.06 + Math.random() * 0.04 : 0.2 + Math.random() * 0.3,
+                isButterfly,
             };
 
             if (isButterfly) {
@@ -440,13 +445,13 @@
             for (let i = 0; i < 3 + Math.floor(Math.random() * 3); i++) {
                 iceCreamParticles.push({
                     x, y,
-                    vx: (Math.random() - 0.5) * 6,
-                    vy: (Math.random() - 0.5) * 5 - 5,
+                    vx: (Math.random() - 0.2) * 4,
+                    vy: (Math.random() - 0.5) * 4 - 6,
                     size: 12 + Math.random() * 18,
                     life: 80 + Math.floor(Math.random() * 60),
                     color: color,
                     isSprinkle: false,
-                    gravity: 0.15,
+                    gravity: 0.35,
                     isButterfly: false
                 });
             }
@@ -454,74 +459,82 @@
     }
 
     function updateParticles() {
-        iceCreamParticles = iceCreamParticles.filter(p => --p.life > 0);
-        iceCreamParticles.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += p.gravity;
-            p.size *= 0.975;
-        });
+    // Ice cream particles - keep frame-based decrement (unchanged)
+    iceCreamParticles = iceCreamParticles.filter(p => --p.life > 0);
+    iceCreamParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.size *= 0.975;
+    });
 
-        butterflyParticles = butterflyParticles.filter(p => --p.life > 0);
+    // Butterfly  ONLY decrement passed ice creams
+    if (iceCreamEncounters > lastIceCreamEncounters) {
+        const encountersThisFrame = iceCreamEncounters - lastIceCreamEncounters;
         butterflyParticles.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += p.gravity;
-            p.size *= 0.975;
+            p.life -= encountersThisFrame;  // decrement by how many passed this frame
         });
+        lastIceCreamEncounters = iceCreamEncounters;
     }
 
-    function drawParticles() {
+    // Filter butterflies after encounter check 
+    butterflyParticles = butterflyParticles.filter(p => p.life > 0);
+
+    // Update movement for surviving butterflies
+    butterflyParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.size *= 0.975;
+    });
+}
+
+function drawParticles() {
         // Ice cream particles - normal fade
         iceCreamParticles.forEach(p => {
-            ctx.save();
-            ctx.globalAlpha = p.life / 100;
-            ctx.fillStyle = p.color;
+                ctx.save();
+                ctx.globalAlpha = p.life / 100;
+                ctx.fillStyle = p.color;
 
-            if (p.isSprinkle) {
-                ctx.translate(p.x, p.y);
-                ctx.rotate(Math.atan2(p.vy, p.vx));
-                ctx.beginPath();
-                ctx.moveTo(-p.size/2, 0);
-                ctx.lineTo(p.size/2, 0);
-                ctx.lineWidth = p.size / 2.5;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = p.color;
-                ctx.stroke();
-            } else {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, Math.max(0.5, p.size), 0, Math.PI*2);
-                ctx.fill();
+                if (p.isSprinkle) {
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(Math.atan2(p.vy, p.vx));
+                    ctx.beginPath();
+                    ctx.moveTo(-p.size/2, 0);
+                    ctx.lineTo(p.size/2, 0);
+                    ctx.lineWidth = p.size / 2.5;
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = p.color;
+                    ctx.stroke();
+                    ctx.restore();
+              } else {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, Math.max(0.5, p.size), 0, Math.PI*2);
+                    ctx.fill();
             }
             ctx.restore();
         });
+        
+// Draw butterfly particles full opacity sparkle
 
-        // Butterfly particles - forced full opacity (no fade for testing)
         butterflyParticles.forEach(p => {
-            ctx.save();
-            ctx.globalAlpha = 1.0;  // full opacity - test motion/life without fade
-            console.log("Butterfly particle alpha:", ctx.globalAlpha);  // should always be 1.0
-            ctx.fillStyle = p.color;
-
-            if (p.isSprinkle) {
+                ctx.save();
+                ctx.globalAlpha = 1.0;  // full opacity - test motion/life without fade
+                console.log("Butterfly alpha set to:", ctx.globalAlpha);
+                ctx.fillStyle = p.color;
+                ctx.font = p.size * 5 + 'px sans-serif';  
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
                 ctx.translate(p.x, p.y);
-                ctx.rotate(Math.atan2(p.vy, p.vx));
-                ctx.beginPath();
-                ctx.moveTo(-p.size/2, 0);
-                ctx.lineTo(p.size/2, 0);
-                ctx.lineWidth = p.size / 2.5;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = p.color;
-                ctx.stroke();
-            } else {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, Math.max(0.5, p.size), 0, Math.PI*2);
-                ctx.fill();
-            }
-            ctx.restore();
+                ctx.fillText(p.isSprinkle ? '✨' : '★', 0, 0);   
+         // ✨ for small sparkles ★ for bigger star
+                ctx.restore();
         });
-    }
-    
+        
+        ctx.globalAlpha = 1;
+        
+}
+   
     // BUTTERFLY FUNCTIONS
     function updateButterflies() {
         butterflies = butterflies.filter(b => b.life > 0);
@@ -798,6 +811,8 @@
         eaten = 0;
         butterfliesEaten = 0;
         totalBites = 0;
+        lastIceCreamEncounters = 0;
+        iceCreamEncounters = 0;
         iceCreamParticles = [];
         butterflyParticles = [];
         butterflies = [];
@@ -972,6 +987,7 @@
                             } else {
                                 eaten = Math.min(eaten + 1, maxEaten);
                                 totalBites += 1;
+                                iceCreamEncounters++;  
                                 o.bites.push({ scoopIndex: j, isTop: isTopStack, angle, size });
                                 createParticles(sx, sy, colors[j], false, 2);
                                 createParticles(sx, sy, colors[j], true, 2);
@@ -1007,6 +1023,7 @@
 
             if (!o.passed && bird.x > o.x + o.width / 2) {
                 o.passed = true;
+                iceCreamEncounters++; 
                 if (o.bites.length === 0) {
                     score++;
                 }
