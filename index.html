@@ -407,7 +407,7 @@
         const randomAdd = Math.floor(Math.random() * 9);
         const baseCount = baseNum + randomAdd;
         const num = isButterfly 
-                ? Math.floor(baseCount * intensity * 0.7) 
+                ? Math.floor(baseCount * intensity * 0.66) 
                 : baseCount * intensity;
 
         for (let i = 0; i < num; i++) {
@@ -426,7 +426,7 @@
                 vx: (Math.random() - 0.5) * (isButterfly ? 4 : 4) * speedMultiplier,
                 vy: (Math.random() - 0.5) * (isButterfly ? 2 : 8) * speedMultiplier - (isButterfly ? 3 : 4),
                 size: particleSize,
-                life: isButterfly ? 5 + Math.floor(Math.random() * 4) : 440,
+                life: isButterfly ? 2 + Math.floor(Math.random() * 1.5) : 440,
                 color: color,
                 isSprinkle,
                 gravity: isButterfly ? 0.06 + Math.random() * 0.04 : 0.2 + Math.random() * 0.3,
@@ -466,16 +466,10 @@
         p.y += p.vy;
         p.vy += p.gravity;
         p.size *= 0.975;
+        if (p.x < -100 || p.x > canvas.width + 100 || p.y < -100 || p.y > canvas.height + 100) {
+        p.life = 0;
+        }
     });
-    
-    if (iceCreamEncounters > lastIceCreamEncounters) {
-        const encountersThisFrame = iceCreamEncounters - lastIceCreamEncounters;
-        console.log("Butterfly life decrement - encounters passed this frame:", encountersThisFrame);
-        butterflyParticles.forEach(p => {
-                p.life -= encountersThisFrame;
-        });
-        lastIceCreamEncounters = iceCreamEncounters;
-}
 
     // Butterfly  ONLY decrement passed ice creams
     if (iceCreamEncounters > lastIceCreamEncounters) {
@@ -494,8 +488,10 @@
         p.x += p.vx;
         p.y += p.vy;
         p.vy += p.gravity;
-        p.size *= 0.975;
-        console.log("Butterfly remaining life:", p.life, "position:", p.x.toFixed(2), p.y.toFixed(2));
+        p.size *= 1.0;
+        if (p.x < -100 || p.x > canvas.width + 100 || p.y < -100 || p.y > canvas.height + 100) {
+        p.life = 0;
+    }
     });
 }
 
@@ -529,9 +525,8 @@ function drawParticles() {
 
         butterflyParticles.forEach(p => {
                 ctx.save();
-                ctx.globalAlpha = 1.0;  // full opacity - test motion/life without fade
                 ctx.fillStyle = p.color;
-                ctx.font = p.size * 5 + 'px sans-serif';  
+                ctx.font = p.size * 4 + 'px sans-serif';  
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.translate(p.x, p.y);
@@ -539,8 +534,6 @@ function drawParticles() {
          // ✨ for small sparkles ★ for bigger star
                 ctx.restore();
         });
-        
-        ctx.globalAlpha = 1;
         
 }
    
