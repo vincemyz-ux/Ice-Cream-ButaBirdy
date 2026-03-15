@@ -142,63 +142,60 @@
             display: block;
         }
         
-#restartButton {
-    margin-top: 16px;
-    width: 250px;
-    padding: 20px 40px 48px 40px;          /* ← extra bottom padding for icons */
-    font-size: 33px;
-    font-family: 'Chewy', cursive;
-    color: yellow;
-    background: #ff69b4;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 8px 20px rgba(255,105,180,0.5), inset 0 -4px 8px rgba(0,0,0,0.2);
-    transition: all 0.18s ease;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-    
-    /* New properties added for icons */
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    overflow: hidden;
-}
+        #restartButton {
+            margin-top: 16px;
+            width: 250px;
+            padding: 20px 40px 48px 40px;
+            font-size: 33px;
+            font-family: 'Chewy', cursive;
+            color: yellow;
+            background: #ff69b4;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255,105,180,0.5), inset 0 -4px 8px rgba(0,0,0,0.2);
+            transition: all 0.18s ease;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+        }
 
-#restartButton:hover {
-    transform: scale(1.08);
-    background: #ff1493;
-    box-shadow: 0 12px 30px rgba(255,20,147,0.6), inset 0 -6px 12px rgba(0,0,0,0.25);
-}
+        #restartButton:hover {
+            transform: scale(1.08);
+            background: #ff1493;
+            box-shadow: 0 12px 30px rgba(255,20,147,0.6), inset 0 -6px 12px rgba(0,0,0,0.25);
+        }
 
-#restartButton:active {
-    transform: scale(0.96);
-    box-shadow: 0 4px 12px rgba(255,105,180,0.4), inset 0 2px 6px rgba(0,0,0,0.3);
-}
+        #restartButton:active {
+            transform: scale(0.96);
+            box-shadow: 0 4px 12px rgba(255,105,180,0.4), inset 0 2px 6px rgba(0,0,0,0.3);
+        }
 
-.ice-group {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    position: absolute;
-    bottom: 12px;
-    left: 0;
-    right: 0;
-}
+        .ice-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            position: absolute;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+        }
 
-.mini-ice {
-    width: 36px;
-    height: auto;
-    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.4));
-    opacity: 0.92;
-    transition: transform 0.25s ease;
-}
+        .mini-ice {
+            width: 36px;
+            height: auto;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.4));
+            opacity: 0.92;
+            transition: transform 0.25s ease;
+        }
 
-#restartButton:hover .mini-ice {
-    transform: translateY(-4px) scale(1.12);
-}
-
+        #restartButton:hover .mini-ice {
+            transform: translateY(-4px) scale(1.12);
+        }
 
         #madeWith { font-size: 38px; margin-top: 38px; opacity: 0.9; color: #FF69B4; }
     </style>
@@ -238,14 +235,14 @@
             <div>You Got Ice Creamed</div>
             <div id="bestScore"></div>
             <button id="restartButton">
-    Play Again
-    <div class="ice-group">
-        <img src="assets/pink.svg" class="mini-ice" alt="">
-        <img src="assets/lemon.svg" class="mini-ice" alt="">
-        <img src="assets/mint.svg" class="mini-ice" alt="">
-        <img src="assets/blue.svg" class="mini-ice" alt="">
-    </div>
-</button>
+                Play Again
+                <div class="ice-group">
+                    <img src="assets/pink.svg" class="mini-ice" alt="">
+                    <img src="assets/lemon.svg" class="mini-ice" alt="">
+                    <img src="assets/mint.svg" class="mini-ice" alt="">
+                    <img src="assets/blue.svg" class="mini-ice" alt="">
+                </div>
+            </button>
             <div id="madeWith">Made with Grok for Giulia</div>
         </div>
     </div>
@@ -307,26 +304,26 @@
         currentEatenSVG    = iceSVGs[Math.floor(Math.random() * iceSVGs.length)];
         currentButterflySVG = iceSVGs[Math.floor(Math.random() * iceSVGs.length)];
         
-// Random order of the four ice creams on Play Again button
-function shuffleIceCreamsOnButton() {
-    const group = document.querySelector('#restartButton .ice-group');
-    if (!group) return;
-
-    const images = Array.from(group.querySelectorAll('.mini-ice'));
-    
-    // Fisher-Yates shuffle
-    for (let i = images.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [images[i], images[j]] = [images[j], images[i]];
-    }
-
-    // Re-append in new order (this rearranges DOM)
-    images.forEach(img => group.appendChild(img));
-}
-
         document.getElementById('dodgedIcon').src   = `assets/${currentDodgedSVG}`;
         document.getElementById('eatenIceIcon').src = `assets/${currentEatenSVG}`;
         document.getElementById('butterflyIcon').src = `assets/${currentButterflySVG}`;
+    }
+
+    // Random order of the four ice creams on Play Again button
+    function shuffleIceCreamsOnButton() {
+        const group = document.querySelector('#restartButton .ice-group');
+        if (!group) return;
+
+        const images = Array.from(group.querySelectorAll('.mini-ice'));
+        
+        // Fisher-Yates shuffle
+        for (let i = images.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [images[i], images[j]] = [images[j], images[i]];
+        }
+
+        // Re-append in new order
+        images.forEach(img => group.appendChild(img));
     }
     
     // BIRD DRAW FUNCTION
@@ -938,10 +935,10 @@ function shuffleIceCreamsOnButton() {
     }
 
     initClouds();
-
+    
     // GAME LOGIC
     function resetGame() {
-        randomizeIcons();  // Apply random icons here
+        randomizeIcons();
 
         bird.y = 300; bird.vy = 0;
         bird.lastFlap = Date.now();
@@ -1040,7 +1037,7 @@ function shuffleIceCreamsOnButton() {
 
     function startFromMenu() {
         if (gameRunning) return;
-        randomizeIcons();  // Also apply here for first start
+        randomizeIcons();
         document.getElementById('menu').style.display = 'none';
         document.getElementById('game').style.display = 'flex';
         resetGame();
@@ -1057,6 +1054,19 @@ function shuffleIceCreamsOnButton() {
             e.preventDefault();
             if (gameRunning) flap();
         }
+    });
+
+    restartButton.addEventListener('click', () => {
+        gameOverEl.style.display = 'none';
+        document.getElementById('game').style.display = 'none';
+        document.getElementById('menu').style.display = 'flex';
+    });
+
+    restartButton.addEventListener('touchstart', e => {
+        e.preventDefault();
+        gameOverEl.style.display = 'none';
+        document.getElementById('game').style.display = 'none';
+        document.getElementById('menu').style.display = 'flex';
     });
     
     function update() {
@@ -1242,43 +1252,31 @@ function shuffleIceCreamsOnButton() {
     }
 
     function endGame() {
-    
-    function endGame() {
         gameRunning = false;
         let newHigh = false;
         if (score > highScore) {
             highScore = score;
             localStorage.setItem('giuliaIceCreamHigh', highScore);
             newHigh = true;
-    }
+        }
 
-    bestScoreEl.textContent = `BEST 🏆 ${score} ${totalBites} ${butterfliesEaten}`;
+        bestScoreEl.textContent = `BEST 🏆 ${score} ${totalBites} ${butterfliesEaten}`;
 
-    // Set button content with icons preserved
-    restartButton.innerHTML = `
-        ${newHigh ? "Play Again? 🍦" : "Play Again? 🍦🍨🍦 "}
-        <div class="ice-group">
-            <img src="assets/pink.svg" class="mini-ice" alt="">
-            <img src="assets/lemon.svg" class="mini-ice" alt="">
-            <img src="assets/mint.svg" class="mini-ice" alt="">
-            <img src="assets/blue.svg" class="mini-ice" alt="">
-        </div>
-    `;
+        // Set button content with icons preserved
+        restartButton.innerHTML = `
+            ${newHigh ? "Play Again? 🍦" : "Play Again? 🍦🍨🍦 "}
+            <div class="ice-group">
+                <img src="assets/pink.svg" class="mini-ice" alt="">
+                <img src="assets/lemon.svg" class="mini-ice" alt="">
+                <img src="assets/mint.svg" class="mini-ice" alt="">
+                <img src="assets/blue.svg" class="mini-ice" alt="">
+            </div>
+        `;
 
         shuffleIceCreamsOnButton();  // Randomize order now
 
         gameOverEl.style.display = 'block';
     }
-        document.getElementById('game').style.display = 'none';
-        document.getElementById('menu').style.display = 'flex';
-    });
-
-    restartButton.addEventListener('touchstart', e => {
-        e.preventDefault();
-        gameOverEl.style.display = 'none';
-        document.getElementById('game').style.display = 'none';
-        document.getElementById('menu').style.display = 'flex';
-    });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
 <script>eruda.init();</script>
