@@ -135,7 +135,7 @@
         #restartButton {
             margin-top: 16px;
             width: 250px;
-            padding: 20px 40px 48px 40px;
+            padding: 20px 40px 68px 40px;
             font-size: 33px;
             font-family: 'Chewy', cursive;
             color: yellow;
@@ -216,7 +216,7 @@
                 <span id="eaten">
                     <img id="eatenIceIcon" src="assets/lemon.svg" class="ice-icon" >
                     <span id="iceCreamCount">0</span>
-                    <img id="butterflyIcon" src="assets/blue.svg" class="butterfly-icon" >
+                    <img id="butterflyIcon" src="assets/pnkbut.svg" class="butterfly-icon">
                     <span id="butterflyCount">0</span>
                 </span>
             </div>
@@ -227,10 +227,10 @@
             <button id="restartButton">
                 Play Again
                 <div class="ice-group">
-                    <img src="assets/pink.svg" class="mini-ice" alt="">
-                    <img src="assets/lemon.svg" class="mini-ice" alt="">
-                    <img src="assets/mint.svg" class="mini-ice" alt="">
-                    <img src="assets/blue.svg" class="mini-ice" alt="">
+                    <img id="btnIcon0" src="assets/pnkbut.svg" class="mini-ice" >
+                    <img id="btnIcon1" src="assets/pink.svg" class="mini-ice" >
+                    <img id="btnIcon2" src="assets/lemon.svg" class="mini-ice" >
+                    <img id="btnIcon3" src="assets/ylwbut.svg" class="mini-ice" >
                 </div>
             </button>
             <div id="madeWith">Made with Grok for Giulia</div>
@@ -238,18 +238,25 @@
     </div>
 
 <script>
-    // SETTINGS
+    const butterflySVGs = ['blubut.svg', 'pnkbut.svg', 'prpbut.svg', 'ylwbut.svg'];
+    const butterflyImages = {};
+
+    butterflySVGs.forEach(file => {
+        const name = file.replace('.svg', '');
+        butterflyImages[name] = new Image();
+        butterflyImages[name].src = `assets/${file}`;
+    });
+
     const sensSlider = document.getElementById('sensitivity');
     const sensValue  = document.getElementById('sensValue');
     let sensitivity = 0.75;
-    let spd = 3.3;  // default BASE_SPEED
+    let spd = 3.3; 
 
     sensSlider.addEventListener('input', (e) => {
         sensitivity = e.target.value / 100;
         sensValue.textContent = e.target.value + '%';
     });
 
-    // CANVASES & ELEMENTS
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const startCanvas = document.getElementById('startBirdCanvas');
@@ -282,7 +289,6 @@
     bestScoreEl.style.color = richPink;
     document.querySelector('#madeWith').style.color = richPink;
 
-    // Random HUD icons per game
     const iceSVGs = ['pink.svg', 'lemon.svg', 'mint.svg', 'blue.svg'];
 
     let currentDodgedSVG = '';
@@ -292,31 +298,31 @@
     function randomizeIcons() {
         currentDodgedSVG   = iceSVGs[Math.floor(Math.random() * iceSVGs.length)];
         currentEatenSVG    = iceSVGs[Math.floor(Math.random() * iceSVGs.length)];
-        currentButterflySVG = iceSVGs[Math.floor(Math.random() * iceSVGs.length)];
-        
         document.getElementById('dodgedIcon').src   = `assets/${currentDodgedSVG}`;
         document.getElementById('eatenIceIcon').src = `assets/${currentEatenSVG}`;
-        document.getElementById('butterflyIcon').src = `assets/${currentButterflySVG}`;
-    }
 
-    // Random order of the four ice creams on Play Again button
-    function shuffleIceCreamsOnButton() {
+        currentButterflySVG = butterflySVGs[Math.floor(Math.random() * butterflySVGs.length)];
+        document.getElementById('butterflyIcon').src = `assets/${currentButterflySVG}`;
+}
+  
+    function randomizePlayAgainIcons() {
         const group = document.querySelector('#restartButton .ice-group');
         if (!group) return;
 
-        const images = Array.from(group.querySelectorAll('.mini-ice'));
-        
-        // Fisher-Yates shuffle
-        for (let i = images.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [images[i], images[j]] = [images[j], images[i]];
-        }
+        const icons = group.querySelectorAll('.mini-ice');
 
-        // Re-append in new order
-        images.forEach(img => group.appendChild(img));
-    }
-    
-    // BIRD DRAW FUNCTION
+        const randomButterfly1 = butterflySVGs[Math.floor(Math.random() * butterflySVGs.length)];
+        const randomButterfly2 = butterflySVGs[Math.floor(Math.random() * butterflySVGs.length)];
+
+        const randomIce1 = iceSVGs[Math.floor(Math.random() * iceSVGs.length)];
+        const randomIce2 = iceSVGs[Math.floor(Math.random() * iceSVGs.length)];
+
+        icons[0].src = `assets/${randomButterfly1}`;
+        icons[1].src = `assets/${randomIce1}`;
+        icons[2].src = `assets/${randomIce2}`;
+        icons[3].src = `assets/${randomButterfly2}`;
+}
+
     function drawBird(c, cx, cy, vy = 0, flapTime = 500, scale = 1) {
         c.save();
         c.translate(cx, cy);
@@ -328,7 +334,6 @@
         const flapProgress = Math.min(flapTime / 250, 1);
         const wingAngle = Math.sin(flapProgress * Math.PI * 2) * 0.7 * (1 - flapProgress);
 
-        // TUMMY
         if (eaten > 0) {
             const progress = Math.pow(eaten / maxEaten, 0.20); 
             const baseRadius = 6 + progress * 23;
@@ -372,14 +377,12 @@
             c.restore();
         }
 
-        // Body
         const grad = c.createRadialGradient(0,0,0,0,0,28);
         grad.addColorStop(0,'#FFEB99'); grad.addColorStop(1,'#FFD700');
         c.fillStyle = grad;
         c.beginPath(); c.ellipse(0,0,22,16,0,0,Math.PI*2); c.fill();
         c.strokeStyle = '#FF8C00'; c.lineWidth = 2/scale; c.stroke();
 
-        // WINGS
         c.save();
         c.translate(-34, 14);
         c.rotate(wingAngle + 0.06);
@@ -399,7 +402,6 @@
 
         c.restore();
 
-        // Head, beak, eye
         const headX = 8, headY = -8, headRadius = 8;
         c.fillStyle = 'white';
         c.beginPath(); c.arc(headX, headY, headRadius, 0, Math.PI * 2); c.fill();
@@ -431,8 +433,7 @@
 
         c.restore();
     }
-    
-    // START BIRD ANIMATION
+   
     function animateStartBird() {
         startCtx.clearRect(0, 0, 180, 180);
         const t = Date.now();
@@ -443,7 +444,6 @@
     }
     animateStartBird();
 
-    // COLORS
     const iceCreamColors = ['#FF8FAB','#FFB07C','#FFF07C','#A3E4D7','#98ff98','#89CFF0','#C5A3FF','#D7BDE2','#B19CD9','#FF5C8A','#A7D8DE','#FF69B4'];
     const sprinkleColors = ['#FF0000','#FF69B4','#00FF00','#0000FF','#FFFF00','#FF4500','#9932CC','#00FFFF','#FFA500','#FF1493'];
     const butterflyColors = ['#FFD700', '#FF69B4', '#00FFFF', '#FF1493', '#FFFF00', '#00FF00', '#FFA500', '#8A2BE2'];
@@ -506,7 +506,6 @@
         return sprinkles;
     }
 
-    // PARTICLES
     function createParticles(x, y, color, isSprinkle = false, intensity = 1, isButterfly = false) {
         const baseNum = isSprinkle ? 5 : 6;
         const randomAdd = Math.floor(Math.random() * 9);
@@ -545,7 +544,6 @@
             }
         }
 
-        // No big chunks for butterflies
         if (intensity >= 2 && !isButterfly) {
             for (let i = 0; i < 3 + Math.floor(Math.random() * 3); i++) {
                 iceCreamParticles.push({
@@ -627,7 +625,6 @@
         });
     }
     
-    // BUTTERFLY FUNCTIONS
     function updateButterflies() {
         butterflies = butterflies.filter(b => b.life > 0);
         butterflies.forEach(b => {
@@ -666,73 +663,38 @@
             b.life--;
         });
     }
-
+    
     function drawButterflies() {
         butterflies.forEach(b => {
             ctx.globalAlpha = b.life / 100;
-            ctx.fillStyle = b.color;
- 
-            const cycle = (frame % b.flapCycle); 
-            let wingAngle = 0;
-            let wingScale = 1;
-
-            if (cycle < 5) {
-                wingAngle = 0.6;
-                wingScale = 1.15;
-            } else if (cycle < 10) {
-                wingAngle = 0.5;
-                wingScale = 1.1;
-            } else if (cycle < 15) {
-                wingAngle = -0.1;
-                wingScale = 0.95;
+    
+            const cycle = (frame % b.flapCycle);
+            let flapScale = 1;
+            if (cycle < 5) flapScale = 1.12;
+            else if (cycle < 10) flapScale = 1.08;
+            else if (cycle < 15) flapScale = 0.96;
+            else flapScale = 1;
+    
+            const img = butterflyImages[b.flavor];
+            if (img && img.complete) {
+                ctx.save();
+                ctx.translate(b.x, b.y);
+                ctx.scale(flapScale * 0.42, flapScale * 0.42);   //   adjust 0.42 if size wrong
+                ctx.drawImage(img, -50, -40, 100, 80);
+                ctx.restore();
             } else {
-                wingAngle = 0;
-                wingScale = 1;
+                //   fallback if image not loaded yet
+                ctx.fillStyle = b.color || '#888';
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, 15, 0, Math.PI * 2);
+                ctx.fill();
             }
-
-            ctx.save();
-            ctx.translate(b.x, b.y);
-            ctx.scale(wingScale, wingScale);
-
-            ctx.save();
-            ctx.rotate(0.785 + wingAngle);
-            ctx.beginPath();
-            ctx.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.strokeStyle = randomColor(sprinkleColors);
-            ctx.lineWidth = 1.6;
-            ctx.beginPath();
-            ctx.moveTo(-8, -2); ctx.lineTo(-2, 2);
-            ctx.moveTo(4, -4); ctx.lineTo(8, 0);
-            ctx.moveTo(-2, 6); ctx.lineTo(2, 10);
-            ctx.stroke();
-
-            ctx.restore();
-
-            ctx.save();
-            ctx.rotate(-0.785 - wingAngle);
-            ctx.beginPath();
-            ctx.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.strokeStyle = randomColor(sprinkleColors);
-            ctx.lineWidth = 1.6;
-            ctx.beginPath();
-            ctx.moveTo(8, -2); ctx.lineTo(2, 2);
-            ctx.moveTo(-4, -4); ctx.lineTo(-8, 0);
-            ctx.moveTo(2, 6); ctx.lineTo(-2, 10);
-            ctx.stroke();
-
-            ctx.restore();
-
-            ctx.restore();
-
+    
             ctx.globalAlpha = 1;
         });
     }
 
-    // DRAW ICE CREAM STACK with bite marks (60% opacity punch)
+    // DRAW ICE CREAM STACK - 60% opacity bite
     function drawIceCreamStack(c, x, baseY, totalHeight, isTop, colors, sprinklesPerScoop, bites = []) {
         const scoopCount = colors.length;
         const scoopRadius = 48;
@@ -1015,6 +977,7 @@
                 direction: 1,
                 startLife: 480 + Math.random() * 500,
                 flapCycle: 30 + Math.floor(Math.random() * 30) 
+                flavor: butterflySVGs[Math.floor(Math.random() * butterflySVGs.length)].replace('.svg', '')
             });
         }
     }
@@ -1263,7 +1226,7 @@
             </div>
         `;
 
-        shuffleIceCreamsOnButton();  // Randomize order now
+        randomizePlayAgainIcons();
 
         gameOverEl.style.display = 'block';
     }
