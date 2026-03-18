@@ -250,15 +250,15 @@
     
     //  Map SVG flavor → particle explosion color
     const butterflyParticleColors = {
-        blubut: '#00FFFF',   // cyan
-        pnkbut: '#FF69B4',   // hot pink
-        prpbut: '#9B59B6',   // purple
-        ylwbut: '#FFD700'    // gold
+        blubut: '#00FBFF',   // medium cyan
+        pnkbut: '#FF52AA',   // soft pink
+        prpbut: '#CE54FF',   // purple
+        ylwbut: '#F0CC0A'    // medium gold
     };
-    
-    // brighter colorss for sparkles  ★  ✨
+   
+    // brighter colorss for sparkles  ★ 
     const brightSparkleVariants = [
-        '#40FFFF',   // brighter cyan
+        '#12A7DE',   // medium bright blue
         '#FF9ACD',   // brighter hot pink
         '#C084E8',   // brighter purple
         '#FFEB3B'    // brighter gold/yellow
@@ -613,15 +613,20 @@
 
         butterflyParticles.forEach(p => {
             ctx.save();
-            const sparkleIndex = ['blubut','pnkbut','prpbut','ylwbut'].indexOf(p.flavor || '');
-            ctx.fillStyle = p.isSprinkle 
-        ? (sparkleIndex !== -1 ? brightSparkleVariants[sparkleIndex] : p.color)
-        : p.color;
+            let fillColor = p.color; 
+            if (p.isSprinkle) {
+            //  Brighter variant for the "sparkle" set
+                const sparkleIndex = ['blubut','pnkbut','prpbut','ylwbut'].indexOf(p.flavor || '');
+                if (sparkleIndex !== -1) {
+                    fillColor = brightSparkleVariants[sparkleIndex];
+                }
+        }
+            ctx.fillStyle = fillColor;
             ctx.font = p.size * 4 + 'px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.translate(p.x, p.y);
-            ctx.fillText(p.isSprinkle ? '✨' : '★', 0, 0);
+            ctx.fillText('★', 0, 0);
             ctx.restore();
         });
     }
@@ -675,7 +680,7 @@
                 ctx.drawImage(img, -50, -40, 100, 80);
                 ctx.restore();
             } else {
-                ctx.fillStyle = b.color || '#888';
+                ctx.fillStyle = '#FF00FF';
                 ctx.beginPath();
                 ctx.arc(b.x, b.y, 15, 0, Math.PI * 2);
                 ctx.fill();
