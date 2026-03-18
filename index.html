@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giulia's Ice Cream Birdy</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chewy&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -188,6 +185,15 @@
         }
 
         #madeWith { font-size: 38px; margin-top: 38px; opacity: 0.9; color: #FF69B4; }
+    </style>
+    <style>
+            @font-face {
+                font-family: 'Chewy';
+                src: url('Chewy-Regular.ttf') format('truetype');
+                font-weight: normal;
+                font-style: normal;
+                font-display: swap;
+            }
     </style>
 </head>
 <body>
@@ -671,12 +677,13 @@
         butterflies.forEach(b => {
             ctx.globalAlpha = b.life / 100
             const flapProgress = Math.sin(frame * b.flapSpeed * 7) * 0.5 + 0.5;
-            const flapScale = 0.6 + flapProgress * 0.50;      //     closed →  open flap scale
+            const flapScale = 0.5 + flapProgress * 0.60;      //     closed →  open flap scale
             const img = butterflyImages[b.flavor];
             if (img && img.complete) {
                 ctx.save();
                 ctx.translate(b.x, b.y);
-                ctx.scale(flapScale * 0.46, 0.46);
+                ctx.rotate(b.rotation);
+                ctx.scale(flapScale * 0.42, 0.4);
                 ctx.drawImage(img, -50, -40, 100, 80);
                 ctx.restore();
             } else {
@@ -965,7 +972,8 @@
                 flapCycle: 30 + Math.floor(Math.random() * 30),
                 flapDuration: 10 + Math.random() * 120,
                 flapSpeed: 0.06 + Math.random() * 0.06,
-                flavor: flavor
+                flavor: flavor,
+                rotation: (Math.random() - 0.5) * Math.PI * 0.8  
             });
         }
     }
