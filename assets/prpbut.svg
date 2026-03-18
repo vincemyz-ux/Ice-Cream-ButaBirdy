@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 120 100" width="100" height="80">
   <g transform="rotate(-32 50 40)">
-    <path d="M50 40 Q-5 -5 -5 40 Q-5 85 50 40" fill="#9B59B6" stroke="#6A1B9A" stroke-width="3"/>
+    <path d="M50 40 Q-5 -5 -5 40 Q-5 85 50 40" fill="#CE54FF" stroke="#8E44AD" stroke-width="3"/>
   </g>
   <g transform="rotate(32 50 40)">
-    <path d="M50 40 Q-5 85 -5 40 Q-5 -5 50 40" fill="#8E44AD" stroke="#6A1B9A" stroke-width="3"/>
+    <path d="M50 40 Q-5 85 -5 40 Q-5 -5 50 40" fill="#B544E3" stroke="#6A1B9A" stroke-width="3"/>
   </g>
   <g transform="rotate(32 50 40)">
-    <path d="M50 40 Q105 -5 105 40 Q105 85 50 40" fill="#9B59B6" stroke="#6A1B9A" stroke-width="3"/>
+    <path d="M50 40 Q105 -5 105 40 Q105 85 50 40" fill="#CE54FF" stroke="#8E44AD" stroke-width="3"/>
   </g>
   <g transform="rotate(-32 50 40)">
-    <path d="M50 40 Q105 85 105 40 Q105 -5 50 40" fill="#8E44AD" stroke="#6A1B9A" stroke-width="3"/>
+    <path d="M50 40 Q105 85 105 40 Q105 -5 50 40" fill="#B544E3" stroke="#6A1B9A" stroke-width="3"/>
   </g>
   <line x1="50" y1="40" x2="76" y2="16" stroke="#000" stroke-width="1.6"/>
   <line x1="50" y1="40" x2="26" y2="16" stroke="#000" stroke-width="1.6"/>
