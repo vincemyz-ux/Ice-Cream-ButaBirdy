@@ -291,6 +291,37 @@
     const bestScoreEl   = document.getElementById('bestScore');
     const restartButton = document.getElementById('restartButton');
 
+    // Audio setup - lightweight preloading
+const sounds = {};
+
+// Preload helper
+function preloadSound(name, url) {
+    const audio = new Audio();
+    audio.src = url;
+    audio.preload = 'auto';
+    audio.load();
+    sounds[name] = audio;
+}
+    
+    // Preload your files
+    preloadSound('eatButterfly', 'audio/eatbut.mp3');
+    preloadSound('eatIce',       'audio/eatice.mp3');
+    preloadSound('flap',         'audio/flap.mp3');
+    preloadSound('gameOver',     'audio/plymor.mp3');
+    
+    // Play function - allows overlapping + volume
+    function playSound(name, volume = 0.9) {
+            if (sounds[name]) {
+                    const instance = sounds[name].cloneNode(true);
+                    instance.volume = volume;
+                    instance.currentTime = 0;
+                    instance.play().catch(err => {
+            // Autoplay policy - common on first load
+                        console.log(`Play blocked for ${name}:`, err.message);
+                    });
+            }
+    }
+    
     let bird = { x: 60, y: 300, vy: 0, radius: 15, lastFlap: Date.now() };
     let eaten = 0;
     const maxEaten = 20;
@@ -980,8 +1011,27 @@
 
     function flap() {
         if (!gameRunning) return;
+        function flap() {
+        if (!gameRunning) return;
+        
+        // One-time audio unlock on first flap
+        if (!window.audioUnlocked) {
+            if (sounds.flap) {                 // check it exists
+                    const unlock = sounds.flap.cloneNode(true);
+                    unlock.volume = 0;            
+                    unlock.currentTime = 0;
+                    unlock.play().catch(() => {});    
+            }
+            window.audioUnlocked = true;
+    }
+
+    bird.vy = getJump();
+    bird.lastFlap = Date.now();
+    playSound('flap', 0.4);
+}
         bird.vy = getJump();
         bird.lastFlap = Date.now();
+        playSound('flap', 0.9);
     }
 
     function startFromMenu() {
@@ -1069,11 +1119,12 @@
                                 o.bites.push({ scoopIndex: j, isTop: isTopStack, angle, size });
                                 o.bites.push({ scoopIndex: j, isTop: isTopStack, angle: angle + 0.4, size: size * 0.8 });
                                 createParticles(sx, sy, colors[j], false, 2);
-                                createParticles(sx, sy, colors[j], true, 2);
+                                createParticles(sx, sy, colors[j], true, 2); 
                                 iceCreamEncounters++;
                             } else {
                                 eaten = Math.min(eaten + 1, maxEaten);
                                 totalBites += 1;
+                                playSound('eatIce', 0.9);
                                 o.bites.push({ scoopIndex: j, isTop: isTopStack, angle, size });
                                 createParticles(sx, sy, colors[j], false, 2);
                                 createParticles(sx, sy, colors[j], true, 2);
@@ -1133,6 +1184,7 @@
             const dy = bird.y - b.y;
             if (Math.hypot(dx, dy) < bird.radius + 6) {
                 butterfliesEaten++;
+                playSound('eatButterfly', 0.9); 
                 createParticles(b.x, b.y, b.color, false, 3, true, b.flavor);
                 createParticles(b.x, b.y, b.color, true, 2, true, b.flavor);
                 butterflies.splice(i, 1);
@@ -1188,15 +1240,16 @@
 
     function endGame() {
         gameRunning = false;
+        playSound('gameOver', 0.9) ;
         let newHigh = false;
         if (score > highScore) {
             highScore = score;
             localStorage.setItem('giuliaIceCreamHigh', highScore);
-            newHigh = true;
+            newHigh = true; 
         }
-
+        
         bestScoreEl.textContent = `BEST 🏆 ${score} ${totalBites} ${butterfliesEaten}`;
-
+       
         restartButton.innerHTML = `
             ${newHigh ? "Play Again?  " : "Play Again?      "}
             <div class="ice-group">
