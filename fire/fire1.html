@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire</title>
+    <style>
+        body { margin:0; padding:0; overflow:hidden; background:#000; height:100vh; }
+        
+        .container { position:relative; width:100%; height:100%; }
+        
+        .track {
+            position:absolute;
+            top:50%;
+            left:100%;
+            height:160px;
+            animation: scroll 3s linear forwards;
+        }
+        
+        @keyframes scroll {
+            to { left: -40%; }
+        }
+        
+        .flame {
+            position:absolute;
+            left:0;
+            top:50%;
+            transform-origin: left center;
+        }
+        
+        .main { transform: scaleY(0.5) translateY(-50%); }
+        #t1   { transform: scaleY(0.6) translateY(-50%); opacity:0; }
+        #t2   { transform: scaleY(0.6) translateY(-50%); opacity:0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="track" id="track">
+            <img src="fire.svg"   class="flame main" alt="">
+            <img src="fire1.svg" id="t1" class="flame" alt="">
+            <img src="fire2.svg" id="t2" class="flame" alt="">
+        </div>
+    </div>
+
+    <script>
+        const track = document.getElementById('track');
+        const t1 = document.getElementById('t1');
+        const t2 = document.getElementById('t2');
+        
+        let use1 = true;
+        let timer = null;
+
+        const duration = 3;
+
+        function randomOn()  { return Math.floor(140 + Math.random() * 300); }
+        function randomRest(){ return Math.floor(70 + Math.random() * 200); }
+
+        function cycle() {
+            t1.style.opacity = '0';
+            t2.style.opacity = '0';
+
+            const on = randomOn();
+            
+            if (use1) t1.style.opacity = '1';
+            else      t2.style.opacity = '1';
+
+            timer = setTimeout(() => {
+                t1.style.opacity = '0';
+                t2.style.opacity = '0';
+                timer = setTimeout(cycle, randomRest());
+            }, on);
+
+            use1 = !use1;
+        }
+
+        function updateScale() {
+            const elapsed = Math.min(Date.now() - performance.timing.navigationStart, duration * 1000);
+            let progress = (elapsed - 600) / (duration * 1000 - 600);   // 0.6s delay, then grow
+
+            if (progress < 0) progress = 0;
+            if (progress > 1) progress = 1;
+            
+            const mainScale = 0.5 + progress * 0.5;
+            const tailScale = 0.6 + progress * 0.4;
+            
+            document.querySelector('.main').style.transform = `scaleY(${mainScale}) translateY(-50%)`;
+            t1.style.transform = `scaleY(${tailScale}) translateY(-50%)`;
+            t2.style.transform = `scaleY(${tailScale}) translateY(-50%)`;
+        }
+
+        setInterval(updateScale, 16);
+        cycle();
+    </script>
+</body>
+</html>
